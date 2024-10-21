@@ -1,10 +1,65 @@
-import { useState } from 'preact/hooks'
-import preactLogo from './assets/preact.svg'
-import viteLogo from '/vite.svg'
-import './app.css'
+// import Post from './Posts'
+import { useEffect, useState } from "preact/hooks";
+import preactLogo from "./assets/preact.svg";
+import viteLogo from "/vite.svg";
+import "./app.css";
+import { PostsContainer } from "./PostsContainer";
+import { Post, PostModel } from "./Posts";
+import { ButtonTest } from "./ButtonTest";
 
 export function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+  const [posts, setPosts] = useState<PostModel[]>([]);
+  const [post, setPost] = useState<PostModel>();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/users/"
+        );
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {}
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/posts/"
+        );
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {}
+    };
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/posts/1/"
+        );
+        const data = await response.json();
+        setPost(data);
+      } catch (error) {}
+    };
+    fetchPost();
+  }, []);
+
+  const handleAddCount = () => {
+    setCount((count) => count + 1);
+  };
+
+  const handleSubtractCount = () => {
+    setCount((count) => count - 1);
+  };
 
   return (
     <>
@@ -18,26 +73,25 @@ export function App() {
       </div>
       <h1>Vite + Preact</h1>
       <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
-        </button>
+        </button> */}
+        <ButtonTest handleQtyChange={handleAddCount} count={count}></ButtonTest>
+        <ButtonTest
+          handleQtyChange={handleSubtractCount}
+          count={count}
+        ></ButtonTest>
         <p>
           Edit <code>src/app.tsx</code> and save to test HMR
         </p>
       </div>
-      <p>
-        Check out{' '}
-        <a
-          href="https://preactjs.com/guide/v10/getting-started#create-a-vite-powered-preact-app"
-          target="_blank"
-        >
-          create-preact
-        </a>
-        , the official Preact + Vite starter
-      </p>
-      <p class="read-the-docs">
-        Click on the Vite and Preact logos to learn more
-      </p>
+      {/* {users.map((user: any) => {
+        return <p>{user?.email}</p>;
+      })}
+      {posts.map((post) => {
+        return <p key={post.id}>{post.title}</p>;
+      })} */}
+      {post ? <Post {...post} /> : ""}
     </>
-  )
+  );
 }
